@@ -44,3 +44,33 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Derectory structure
+
+chat-app/
+├── frontend/          # Reactアプリケーション
+│   ├── package.json
+│   ├── public/
+│   └── src/
+│       ├── App.tsx
+│       ├── App.css
+│       ├── index.tsx
+│       ├── components/
+│       │   ├── LoginForm.tsx
+│       │   └── RegisterForm.tsx
+│       ├── context/
+│       │   └── AuthContext.tsx
+│       └── types/
+│           └── auth.ts
+│
+└── backend/           # Node.js/Expressサーバー
+    ├── package.json
+    ├── server.ts      # メインサーバーファイル
+    └── src/
+        ├── routes/    # APIルート
+        │   ├── auth.ts
+        │   └── messages.ts
+        ├── models/    # データベースモデル
+        │   └── user.ts
+        └── middleware/
+            └── auth.ts
