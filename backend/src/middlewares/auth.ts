@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
-interface AuthRequest extends Request {
+export interface AuthRequest extends Request {
   user?: {
     userId: number;
     email: string;
@@ -13,7 +13,6 @@ export const authMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  // <= ここに => を追加
   try {
     const token = (req.headers as Record<string, string>).authorization?.split(
       " "

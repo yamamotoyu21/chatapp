@@ -1,5 +1,7 @@
 import express, { Request, Response } from "express";
 import authRoutes from "./routes/auth";
+import messageRoutes from "./routes/message";
+
 import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -22,6 +24,7 @@ app.use(
 
 app.use(express.json()); // リクエストボディを解析するためのミドルウェア
 app.use("/auth", authRoutes); // "/auth" でルートを登録
+app.use("/message", messageRoutes);
 
 async function initDB() {
   try {
@@ -77,42 +80,5 @@ async function checkTableStructure() {
     console.error("Error checking table structure:", e);
   }
 }
-
-// async function initDB() {
-//   try {
-//     // メッセージテーブルの作成
-//     await pool.query(`
-//       CREATE TABLE IF NOT EXISTS messages (
-//         id SERIAL PRIMARY KEY,
-//         content TEXT NOT NULL,
-//         username VARCHAR(100) NOT NULL,
-//         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-//       )
-//     `);
-
-//     await pool.query(`
-//       CREATE INDEX IF NOT EXISTS idx_messages_content
-//       ON messages USING gin(to_tsvector('english', content))
-//     `);
-
-//     // ユーザーテーブルの作成
-//     await pool.query(`
-//       CREATE TABLE IF NOT EXISTS users (
-//         id SERIAL PRIMARY KEY,
-//         email VARCHAR(255) UNIQUE NOT NULL,
-//         password VARCHAR(255) NOT NULL,
-//         username VARCHAR(100) UNIQUE NOT NULL,
-//         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-//       )
-//     `);
-
-//     app.listen(port, () => {
-//       console.log(`Server is running on http://localhost:${port}`);
-//     });
-//     console.log(`Database initialized successfully`);
-//   } catch (e) {
-//     console.log(`Error initializing database`, e);
-//   }
-// }
 
 initDB();

@@ -53,7 +53,7 @@ const Chat: React.FC = () => {
     const fetchMessages = async () => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch("http://localhost:3001/api/messages", {
+            const response = await fetch("http://localhost:3001/message", {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -74,7 +74,7 @@ const Chat: React.FC = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(
-                `http://localhost:3001/api/messages/search?query=${encodeURIComponent(searchQuery)}`,
+                `http://localhost:3001/message/search?query=${encodeURIComponent(searchQuery)}`,
                 {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -94,7 +94,7 @@ const Chat: React.FC = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch("http://localhost:3001/api/messages", {
+            const response = await fetch("http://localhost:3001/message", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
