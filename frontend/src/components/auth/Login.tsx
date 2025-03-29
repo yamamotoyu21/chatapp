@@ -11,18 +11,26 @@ const Login: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            console.log('Attempting login with:', { email, password });
+            
             const response = await axios.post('http://localhost:3001/auth/login', {
                 email,
                 password,
+            }, {
+                withCredentials: true // CORSの認証情報を含める
             });
-
+    
+            console.log('Login response:', response.data);
+    
             const { token } = response.data;
             localStorage.setItem('token', token);
-
+    
             navigate('/chat');
-        } catch (error) {
-            setError('ログインに失敗しました。認証情報を確認してください。');
+        } catch (error: any) {
+            console.error('Login error:', error.response?.data || error.message);
+            setError(error.response?.data?.message || 'ログインに失敗しました。認証情報を確認してください。');
         }
+
     };
 
     return (

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom'
 
 const Register: React.FC = () => {
+    const [name, setName] = useState('')
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('')
     const [confirmationPassword, setConfirmationPassword] = useState('')
@@ -12,7 +13,7 @@ const Register: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        console.log('Attempting to register with:', { email, password }); // デバッグログ
+        console.log('Attempting to register with:', {  name ,email, password,}); // デバッグログ
       
         try {
           const response = await fetch('http://localhost:3001/auth/register', {
@@ -21,7 +22,7 @@ const Register: React.FC = () => {
               'Content-Type': 'application/json',
             },
             credentials: 'include', // 必要に応じて
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ name, email, password }),
           });
       
           console.log('Registration response status:', response.status); // レスポンスステータス
@@ -32,7 +33,8 @@ const Register: React.FC = () => {
           if (response.ok) {
             // 登録成功時の処理
             console.log('Registration successful');
-            // ここにリダイレクトなどの処理を追加
+            // ここにリダイレクトなどの処理を追加x
+            navigate('/login')
           } else {
             // エラー処理
             console.error('Registration failed:', data.message);
@@ -53,6 +55,16 @@ const Register: React.FC = () => {
                     )}
                     <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                         <div className="rounded-md shadow-sm -space-y-px">
+                        <div>
+                                <input
+                                    type="text"
+                                    required
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                    placeholder="ユーザーネーム(ニックネーム可)"
+                                />
+                            </div>
                             <div>
                                 <input
                                     type="email"
