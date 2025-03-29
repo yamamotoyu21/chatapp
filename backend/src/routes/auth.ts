@@ -44,7 +44,6 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
       .json({ message: "メールアドレスとパスワードを入力してください" });
     return;
   }
-
   try {
     const token = await UserModel.authenticate(email, password);
     console.log("Authentication result:", { success: !!token });
@@ -59,6 +58,21 @@ router.post("/login", async (req: Request, res: Response): Promise<void> => {
     res.json({ token });
   } catch (error) {
     console.error("Error during login:", error);
+    res.status(500).json({ message: "内部エラーが発生しました" });
+  }
+});
+
+router.post("/logout", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      res.status(401).json({ message: "認証トークンがありません" });
+      return;
+    }
+    const token = authHeader.split(" ")[1];
+    res.status(200).json({ message: "ログアウトしました" });
+  } catch (error) {
+    console.error("Error during logout:", error);
     res.status(500).json({ message: "内部エラーが発生しました" });
   }
 });
