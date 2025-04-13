@@ -1,33 +1,18 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response } from "express";
 import { MessageModel } from "../models/message";
-import jwt from "jsonwebtoken";
+import { authMiddleware, AuthRequest } from "../middlewares/auth";
+import { Server } from "socket.io";
 
 const router = express.Router();
+let io: Server | null = null;
 
-// 認証ミドルウェア（メッセージルーター専用）
-const verifyToken = (req: Request, res: Response, next: NextFunction): void => {
-  try {
-    const token = req.headers.authorization?.split(" ")[1];
-
-    if (!token) {
-      res.status(401).json({ message: "認証トークンがありません" });
-      return;
-    }
-
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "your-secret-key"
-    );
-
-    (req as any).user = decoded;
-    next();
-  } catch (error) {
-    res.status(403).json({ message: "無効な認証トークンです" });
-  }
+// Socket.ioインスタンスを設定するための関数
+export const setSocketIo = (socketIo: Server) => {
+  io = socketIo;
 };
 
 // すべてのメッセージを取得
-router.get("/", verifyToken, (req: Request, res: Response): void => {
+router.get("/", authMiddleware, (req: AuthRequest, res: Response) => {
   MessageModel.getAllMessages()
     .then((messages) => {
       res.json(messages);
@@ -39,7 +24,7 @@ router.get("/", verifyToken, (req: Request, res: Response): void => {
 });
 
 // メッセージを検索
-router.get("/search", verifyToken, (req: Request, res: Response): void => {
+router.get("/search", authMiddleware, (req: AuthRequest, res: Response) => {
   const query = req.query.query as string;
 
   if (!query) {
@@ -58,19 +43,28 @@ router.get("/search", verifyToken, (req: Request, res: Response): void => {
 });
 
 // 新しいメッセージを作成
-router.post("/", verifyToken, (req: Request, res: Response): void => {
+router.post("/", authMiddleware, (req: AuthRequest, res: Response) => {
   const { content, username } = req.body;
+  const userId = req.user?.userId;
 
-  if (!content || !username) {
-    res.status(400).json({ message: "内容とユーザー名を入力してください" });
+  if (!content) {
+    res.status(400).json({ message: "メッセージ内容を入力してください" });
     return;
   }
 
-  MessageModel.createMessage(content, username)
+  // HTTPリクエストでもユーザーID情報を利用
+  const actualUsername = username || req.user?.email || "unknown";
+
+  MessageModel.createMessage(content, actualUsername)
     .then((newMessage) => {
       if (!newMessage) {
         res.status(500).json({ message: "メッセージの作成に失敗しました" });
         return;
+      }
+
+      // Socket.ioが設定されている場合、新しいメッセージをブロードキャスト
+      if (io) {
+        io.emit("newMessage", newMessage);
       }
 
       res.status(201).json(newMessage);
